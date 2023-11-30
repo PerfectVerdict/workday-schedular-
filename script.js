@@ -1,76 +1,89 @@
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
 $(function () {
-  // TODO: Add code to apply the past, present, or future class to each time
-  // TODO block by comparing the id to the current hour.
-  //*Iterates over each jquery object (each element with a class
-  //* of 'time-block')
+
+//* Adding classes depending on current time:
+
+    //?Iterates over each element with a class of 'time-block'
   $('.time-block').each(function() {
-    //*declaring the div that we can traverse from on the next line
-    //* to get the time to compare to 'currentHour'
-    let timeIdDiv = $(this); //*'this' refers to the current element
-                             //*that the .each function operates on
-    let time = timeIdDiv.attr('id'); //*isolating the id
-    let timeInt = Number(time.split('-')[1]); //* isolating the integer
-    //! Credit to github Ai sidebar                                          
+
+    //? Declaring the div that we can traverse from.
+    //?'This' refers to the current element
+    //? that the .each function operates on (.time-block)
+    let timeIdDiv = $(this); 
+
+    
+    //?Isolating the id             
+    let time = timeIdDiv.attr('id');
+
+                    //! Credit to github Ai sidebar ///////////// 
+    //! When the page loads, the stored string is retrieved from local storage:
+    let storedData = localStorage.getItem(time);
+    //! If there's stored data for this time block, set the value of the textarea
+    if (storedData) {
+      $(this).find('textarea').val(storedData);
+    }
+                      //! ////////////////////////////////////////////
+
+    //? isolating the integer so we can compare to current time.
+    let timeInt = Number(time.split('-')[1]); 
+                    //! Credit to github Ai sidebar ///////////// 
+
+    //? Get current hour in 24 hour format (H)                                       
     let currentHour = Number(dayjs().format('H'))
-    console.log(currentHour)
 
-
+    //? Compare currentHour wth timeInt. Apply classes accordingly.
     if (timeInt === currentHour)
       timeIdDiv.addClass("present")
     else if (timeInt < currentHour)
       timeIdDiv.addClass("past")
     else if (timeInt > currentHour)
       timeIdDiv.addClass("future")
+                          //! ////////////////////////////////////////
   });
-  // ! Current Day and Time:
+
+  //? Adding time and date to main page.
+  // ? Current Day and Time:
   let currentDay = dayjs().format('dddd, MMMM D YYYY')
   let currentTime = dayjs().format('h:mm:ss a')
-  //! Append Current Day and Time:
+
+  //? Append Current Day and Time:
   $('#currentDay').text(currentDay)
   $('#currentTime').text(currentTime)
+
+  //?change current time every second. 'a' means lowecase am/pm,
   setInterval(function() {
     currentTime = dayjs().format('h:mm:ss a');
     $('#currentTime').text(currentTime);
   }, 1000);
 
-  // TODO: Add a listener for click events on the save button.
-  //! Give JS The Save Buttons:
 
- 
+
+//* TODO: Add a listener for click events on the save button.
+
+  //? Give JS The Save Buttons:
   let saveBtn = $('.saveBtn')
   saveBtn.on('click', function() {
+
+    //? Create an object so we can utilize local storage.
     let obj = new Object();
-      //TODO use the id in the containing time-block as a key to save the user input in local storage. 
-      //*How can DOM traversal be used to get the "hour-x" id of the
-      //* time-block containing the button that was clicked? How might the id be
-      // *useful when saving the description in local storage?
+
+    //?When you click the save button, navigate to the parent
     let timeIdDiv = $(this).parent()
+
+    //? then grab the time (as the id)
     let time= $(timeIdDiv).attr('id')
-    //! Credit to Github ai sidepanel///////////////////
-      //*Get the integer of the div so we can later compare it and add
-      //* or remove classes. .split('-') turns the id into an array of
-      //* strings, with "hour" at idex 0 and "(the hour itself)" at
-      //* index one. Thats why we use [1].
-    let timeInt = Number(time.split('-')[1]); 
+
+                  //! Credit to Github ai sidepanel///////////////////
+    //? We want the id to be (time)
+    // let timeInt = Number(time.split('-')[1]); 
+    //* Finds a textarea child. declares new var according to value thereof.
     let userInput = $(timeIdDiv).find('textarea').val();
+
     //* add user input to object
     obj[time] = userInput;
-    //! /////////////
-    
-    //TODO HINTS: How can the id
-    // TODO attribute of each time-block be used to conditionally add or remove the
+    console.log(time)
 
-
-    // past, present, and future classes? How can Day.js be used to get the
-    // current hour in 24-hour time?
-    //
-    // TODO: Add code to get any user input that was saved in localStorage and set
-    // the values of the corresponding textarea elements. HINT: How can the id
-    // attribute of each time-block be used to do this?
-    //
-    // TODO: Add code to display the current date in the header of the page.
+    //? Put user input in local storage
+    localStorage.setItem(time, userInput)
+                   //! /////////////////////////////////////////////////
     })
   })
